@@ -1,27 +1,7 @@
-# CL Data Fetcher
+# Brownie Quickstart
 
-Quickly fetches the data for you to use
+Based on hundreds of quick brownie setups.
 
-Get the timestamp to start
+Added .env so you can inject RPC keys
 
-```python
-feed = Feed.at("0xaaB2f6b45B28E962B3aCd1ee4fC88aEdDf557756")
-latest_round = 36893488147419119266
-last_time = 1669064807
-while (last_time > 1668804876):
-...  (round, answer, start, update, answeredInRound) = feed.getRoundData(latest_round)
-...  latest_round -= 1
-...  last_time = update
-...  print("last_time", last_time)
-...  print("answer", answer)
-```
-
-## Regex to get CSV Data
-
-Use VS Code Find and Replace
-
-last_time (.*)\n
-$1,
-
-answer (.*)
-$1,
+Added brownie-config so you don't need to check the docs for the thousands time
