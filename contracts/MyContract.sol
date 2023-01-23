@@ -8,6 +8,5 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 
 contract MyContract {
   function do_theTHING(IERC20 t) external {
-    IERC20(t).transferFrom(address, address(2), 3);
   }
 }

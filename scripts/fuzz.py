@@ -12,83 +12,55 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-INTEREST = 200 # 2% Yearly
-MAX_BPS = 10_000
-TIME = 60 * 60 * 24 * 365.25 ## Interest compounded each second
+PLCR = 103
 
-RUNS = 10000
+## Change this according to MAX_LTV
+MIN_CR = 125
 
-MAX_PRINCIPAL = 10_000
-MAX_DEBT = 10_000
-## Price ratio
-RATIO = 13
+RUNS = 10_000
 
-def to_csv(headers, entries):
-    # Create a file with current time as name
-    os.makedirs('sims/', exist_ok=True)
-    filename = f'sims/{pd.Timestamp.now()}.csv'
+## Change to w/e later
+PRICE = 1
 
-    with open(filename, 'w', encoding='UTF8') as f:
-        writer = csv.writer(f)
+MAX_COLLATERAL = 10_000
 
-        # write the header
-        writer.writerow(headers)
+## 125 is max ICR with 80%
+MAX_LTV = 80
 
-        # write the data
-        for entry in entries:
-            writer.writerow([entry[0], entry[1], entry[2]])
+ONE_HUNDRED = 100
 
-def main():
-  print("INTEREST", INTEREST)
-  print("MAX_BPS", MAX_BPS)
-  print("TIME", TIME)
+## Liquidate 50% for now
+PARTIAL_LIQUIDATION_SIZE = 50
 
-  headers = [
-    "Debt Start",
-    "Debt End",
-    "Time Duration",
-  ]
-
-  entries = []
-
-  inital_principal = random() * MAX_PRINCIPAL
-  initial_debt = random() * MAX_PRINCIPAL
-  
+def main():  
   run = 0
   found = 0
 
   while run < RUNS:
-    principal = random() * MAX_PRINCIPAL
-    debt = principal * RATIO
+    collateral = random() * MAX_COLLATERAL
+    print("collateral", collateral)
 
-    ## Skip, only go for those that are below the initial
-    if(debt > initial_debt):
-      continue
+    underwater_percent = random() * (ONE_HUNDRED - MAX_LTV)
+    print("underwater_percent", underwater_percent)
 
-    ## Up to 1 year
-    elapsed = random() * TIME
+    debt = PRICE * collateral * (MAX_LTV + underwater_percent) / ONE_HUNDRED
 
-    print("elapsed", elapsed)
-    multiplier = exp(elapsed * INTEREST / MAX_BPS / TIME)
+    print("debt", debt)
 
-    new_debt = debt * multiplier
+    ICR = collateral * PRICE / debt * 100
+    print("ICR", ICR)
 
-    print("multiplier", multiplier)
 
-    # entries.append([debt, new_debt, elapsed])
-    if(new_debt > initial_debt):
-      print("")
-      print("")
-      print("initial_debt", initial_debt)
-      print("debt", debt)
-      print("elapsed", elapsed)
-      print("multiplier", multiplier)
-      
-      found += 1
+    print("Liquidate")
+    debt_we_repay = PARTIAL_LIQUIDATION_SIZE * collateral / ONE_HUNDRED
+    collateral_with_bonus = debt_we_repay * PRICE * PLCR / ONE_HUNDRED
+
+    print("debt_we_repay", debt_we_repay)
+    print("collateral_with_bonus", collateral_with_bonus)
+
+    NEW_ICR = (collateral - collateral_with_bonus) * PRICE / (debt - debt_we_repay) * ONE_HUNDRED
+
+    print("NEW_ICR", NEW_ICR)
+    assert(NEW_ICR >= MIN_CR)
 
     run += 1
-
-  print("Total Found", found)
-  print("Total RUNS", RUNS)
-  
-  # to_csv(headers, entries)
