@@ -1,16 +1,4 @@
 from random import random
-from math import exp
-
-
-## CSV
-import csv
-import os
-import time
-
-## Visualization / Formatting
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
 
 PLCR = 103
 
